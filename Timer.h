@@ -2,28 +2,49 @@
 #define _TIMER_H_
 
 #include <Windows.h>
-
+// TODO : 타이머 기능 강화
 namespace radx
 {
 	class Timer
 	{
 	public:
-		Timer() { ZeroMemory(this, CLASS_BYTE_SIZE); }
+		Timer() = default;
 		~Timer() = default;
 
 		void InitTime() 
 		{ 
 			QueryPerformanceFrequency(&mFrequency);
 			QueryPerformanceCounter(&mOldTime); 
+			QueryPerformanceCounter(&mCurTime);
+			mbStop = true;
 		}
 
-		inline void SetTime()
+		void StopTimer()
+		{
+			mbStop = true;
+		}
+
+		void StartTimer()
+		{
+			mbStop = false;
+		}
+
+		bool IsTimerStoped()
+		{
+			return mbStop;
+		}
+
+		inline void ResetTime()
 		{
 			mOldTime = mCurTime;
 		}
 
 		inline float GetTime() 
 		{
+			if (mbStop)
+			{
+				return 0.0f;
+			}
 			QueryPerformanceCounter(&mCurTime);
 			return mDeltaTime = (mCurTime.QuadPart - mOldTime.QuadPart) / (float)mFrequency.QuadPart;
 		}
@@ -34,6 +55,8 @@ namespace radx
 		LARGE_INTEGER	mOldTime;
 		LARGE_INTEGER	mCurTime;
 		float			mDeltaTime;
+
+		bool			mbStop;
 	};
 
 }

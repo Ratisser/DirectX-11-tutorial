@@ -19,12 +19,14 @@ namespace radx
 	{
 		bool bResult;
 		mhWnd = hWnd;
+
 		TimerManager::GetInstance().SystemTimer.InitTime();
-		TimerManager::GetInstance().SystemTimer.SetTime();
+		TimerManager::GetInstance().SystemTimer.ResetTime();
+		TimerManager::GetInstance().SystemTimer.StartTimer();
 
 		mD3D = (D3D*)_aligned_malloc(sizeof(D3D), 16);
 
-		bResult = mD3D->Initialize(hWnd, false, clientWidth, clientHeight);
+		bResult = mD3D->Initialize(hWnd, true, clientWidth, clientHeight);
 		//assert(bResult == true && "could not initialize Direct3D.");
 		if (!bResult)
 		{
@@ -46,8 +48,11 @@ namespace radx
 		}
 	}
 
-	void Graphics::Render()
+	void Graphics::Frame()
 	{
+		// 씬을 업데이트 합니다.
+		mD3D->UpdateScene();
+
 		static UINT frameCount = 0;
 		static float timeElapsed = TimerManager::GetInstance().SystemTimer.GetTime();
 

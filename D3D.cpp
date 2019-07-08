@@ -285,6 +285,7 @@ namespace radx
 		mMesh.SetPosition(XMVectorSet(3.0f, 0.0f, 1.0f, 0.0f));
 
 		TimerManager::GetInstance().DeltaTimeTimer.InitTime();
+		TimerManager::GetInstance().DeltaTimeTimer.StartTimer();
 		return true;
 	}
 
@@ -342,53 +343,71 @@ namespace radx
 		}
 	}
 
-	void D3D::BeginScene(float red, float green, float blue, float alpha)
+	void D3D::UpdateScene()
 	{
-		TimerManager::GetInstance().DeltaTimeTimer.SetTime();
+		TimerManager::GetInstance().DeltaTimeTimer.ResetTime();
 		float deltaTime = TimerManager::GetInstance().DeltaTimeTimer.GetTime();
 		const float DGREE = 100.0f;
 
+		if (!TimerManager::GetInstance().DeltaTimeTimer.IsTimerStoped())
+		{
+			if (GetAsyncKeyState('A') & 0x8000)
+			{
+				mCamera.RotateCamera(0.0f, -DGREE * deltaTime, 0.0f);
+			}
+			else if (GetAsyncKeyState('D') & 0x8000)
+			{
+				mCamera.RotateCamera(0.0f, DGREE * deltaTime, 0.0f);
+			}
+			if (GetAsyncKeyState('W') & 0x8000)
+			{
+				mCamera.RotateCamera(-DGREE * deltaTime, 0.0f, 0.0f);
+			}
+			else if (GetAsyncKeyState('S') & 0x8000)
+			{
+				mCamera.RotateCamera(DGREE * deltaTime, 0.0f, 0.0f);
+			}
+
+			if (GetAsyncKeyState('J') & 0x8000)
+			{
+				mMesh.Move(-5.0f * deltaTime, 0.0f, 0.0f);
+			}
+			else if (GetAsyncKeyState('L') & 0x8000)
+			{
+				mMesh.Move(5.0f * deltaTime, 0.0f, 0.0f);
+			}
+			if (GetAsyncKeyState('I') & 0x8000)
+			{
+				mMesh.Move(0.0f, 0.0f, 5.0f * deltaTime);
+			}
+			else if (GetAsyncKeyState('K') & 0x8000)
+			{
+				mMesh.Move(0.0f, 0.0f, -5.0f * deltaTime);
+			}
+
+			mMesh.Rotate(180 * deltaTime * RADIAN, 360 * deltaTime * RADIAN, 0.0f);
+		}
+
+
+
+		if (GetAsyncKeyState('Z') & 0x8000)
+		{
+			TimerManager::GetInstance().DeltaTimeTimer.StopTimer();
+		}
+		else if (GetAsyncKeyState('X') & 0x8000)
+		{
+			TimerManager::GetInstance().DeltaTimeTimer.ResetTime();
+			TimerManager::GetInstance().DeltaTimeTimer.StartTimer();
+		}
+
+	}
+
+	void D3D::BeginScene(float red, float green, float blue, float alpha)
+	{
 		float color[] = { red, green, blue, alpha };
 		mDeviceContext->ClearRenderTargetView(mRenderTargetView, color);
 
 		ConstantBuffer cb;
-
-		if (GetAsyncKeyState('A') & 0x8000)
-		{
-			mCamera.RotateCamera(0.0f, -DGREE * deltaTime, 0.0f);
-		}
-		else if (GetAsyncKeyState('D') & 0x8000)
-		{
-			mCamera.RotateCamera(0.0f, DGREE * deltaTime, 0.0f);
-		}
-		if (GetAsyncKeyState('W') & 0x8000)
-		{
-			mCamera.RotateCamera(-DGREE * deltaTime, 0.0f, 0.0f);
-		}
-		else if (GetAsyncKeyState('S') & 0x8000)
-		{
-			mCamera.RotateCamera(DGREE * deltaTime, 0.0f, 0.0f);
-		}
-
-		if (GetAsyncKeyState('J') & 0x8000)
-		{
-			mMesh.Move(-5.0f * deltaTime, 0.0f, 0.0f);
-		}
-		else if (GetAsyncKeyState('L') & 0x8000)
-		{
-			mMesh.Move(5.0f * deltaTime, 0.0f, 0.0f);
-		}
-		if (GetAsyncKeyState('I') & 0x8000)
-		{
-			mMesh.Move(0.0f, 0.0f, 5.0f * deltaTime);
-		}
-		else if (GetAsyncKeyState('K') & 0x8000)
-		{
-			mMesh.Move(0.0f, 0.0f, -5.0f * deltaTime);
-		}
-
-		mMesh.Rotate(180 * deltaTime * RADIAN, 360 * deltaTime * RADIAN, 0.0f);
-
 		mWorld = mMesh.GetWorldMatrix();
 		mView = mCamera.GetViewMatrix();
 		cb.World = XMMatrixTranspose(mWorld);

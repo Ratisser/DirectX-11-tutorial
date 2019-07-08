@@ -16,7 +16,6 @@ namespace radx
 
 	bool RADXSystem::Initialize()
 	{
-
 		mInput = std::make_unique<Input>();
 		mGraphics = std::make_unique<Graphics>();
 
@@ -72,7 +71,7 @@ namespace radx
 			}
 			else
 			{
-				mGraphics->Render();
+				mGraphics->Frame();
 			}
 		}
 		return msg.wParam;

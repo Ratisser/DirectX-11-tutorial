@@ -32,6 +32,7 @@ namespace radx
 		void ReleaseAsset();
 		void Release();
 
+		void UpdateScene();
 		void BeginScene(float red, float green, float blue, float alpha);
 		void EndScene();
 

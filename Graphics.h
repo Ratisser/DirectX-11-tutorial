@@ -13,7 +13,7 @@ namespace radx
 		bool				Initialize(HWND hWnd, UINT clientWidth, UINT clientHeight);
 		void				Release();
 		
-		void				Render();
+		void				Frame();
 		
 	private:
 		D3D*				mD3D;
