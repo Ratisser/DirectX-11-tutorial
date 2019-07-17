@@ -50,7 +50,6 @@ namespace radx
 		}
 
 	private:
-		enum { CLASS_BYTE_SIZE = 28 };
 		LARGE_INTEGER	mFrequency;
 		LARGE_INTEGER	mOldTime;
 		LARGE_INTEGER	mCurTime;

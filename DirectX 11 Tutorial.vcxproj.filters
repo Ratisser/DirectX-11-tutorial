@@ -29,12 +29,6 @@
     <ClCompile Include="RADXSystem.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source Files\Window</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files\Graphic</Filter>
-    </ClCompile>
     <ClCompile Include="D3D.cpp">
       <Filter>Source Files\Graphic</Filter>
     </ClCompile>
@@ -47,6 +41,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Graphic</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicWindow.h">
@@ -57,12 +54,6 @@
     </ClInclude>
     <ClInclude Include="RADXSystem.h">
       <Filter>Source Files\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Source Files\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Source Files\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Source Files\Graphic</Filter>
@@ -82,9 +73,15 @@
     <ClInclude Include="TimerManager.h">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL.fx">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Texture.fx">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

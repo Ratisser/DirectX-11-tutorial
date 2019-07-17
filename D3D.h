@@ -32,13 +32,20 @@ namespace radx
 		void ReleaseAsset();
 		void Release();
 
+		void Frame();
+
+		const char* GetVideoCardDescription();
+
+	private:
 		void UpdateScene();
 		void BeginScene(float red, float green, float blue, float alpha);
 		void EndScene();
-
 	private:
 		enum { VIDEO_CARD_DESC_SIZE = 128 };
 
+		HWND						mhWnd;
+		UINT						mClientWidth;
+		UINT						mClientHeight;
 		ID3D11Device*				mDevice;
 		ID3D11DeviceContext*		mDeviceContext;
 		IDXGISwapChain*				mSwapChain;

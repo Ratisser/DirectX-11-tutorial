@@ -14,4 +14,3 @@ private:
 	XMVECTOR mPosition;
 	XMVECTOR mRotation;
 };
-

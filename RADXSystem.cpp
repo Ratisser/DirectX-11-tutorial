@@ -7,6 +7,7 @@ namespace radx
 		: BasicWindow(hInstance, szWndName)
 		, mClientWidth(clientWidth)
 		, mClientHeight(clientHeight)
+		, mD3D(nullptr)
 	{
 	}
 
@@ -16,47 +17,52 @@ namespace radx
 
 	bool RADXSystem::Initialize()
 	{
-		mInput = std::make_unique<Input>();
-		mGraphics = std::make_unique<Graphics>();
+		TimerManager::GetInstance().SystemTimer.InitTime();
+		TimerManager::GetInstance().SystemTimer.ResetTime();
+		TimerManager::GetInstance().SystemTimer.StartTimer();
 
 		if (false == InitWindow())
 		{
 			return false;
 		}
 
-		if (false == mGraphics->Initialize(mhWnd, mClientWidth, mClientHeight))
+		mD3D = (D3D*)_aligned_malloc(sizeof(D3D), 16);
+		if (false == mD3D->Initialize(mhWnd, true, mClientWidth, mClientHeight))
 		{
+			mD3D->Release();
+			_aligned_free(mD3D);
+			mD3D = nullptr;
 			return false;
 		}
 
 		return true;
 	}
 
-	void RADXSystem::ChangeScreenMode(bool bFullScreen)
-	{
-		DEVMODE devMode = { 0 };
+	//void RADXSystem::ChangeScreenMode(bool bFullScreen)
+	//{
+	//	DEVMODE devMode = { 0 };
 
-		RECT rect;
+	//	RECT rect;
 
-		if (bFullScreen)
-		{
-			SetWindowLong(mhWnd, GWL_STYLE, WS_POPUP);
-			SetWindowPos(mhWnd, 0, 0, 0, mClientWidth, mClientHeight, SWP_SHOWWINDOW);
-			devMode.dmPelsWidth = mClientWidth;
-			devMode.dmPelsHeight = mClientHeight;
-			devMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
-			ChangeDisplaySettings(&devMode, CDS_FULLSCREEN);
-		}
-		else {
-			ChangeDisplaySettings(NULL, 0);
-			SetWindowLong(mhWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+	//	if (bFullScreen)
+	//	{
+	//		SetWindowLong(mhWnd, GWL_STYLE, WS_POPUP);
+	//		SetWindowPos(mhWnd, 0, 0, 0, mClientWidth, mClientHeight, SWP_SHOWWINDOW);
+	//		devMode.dmPelsWidth = mClientWidth;
+	//		devMode.dmPelsHeight = mClientHeight;
+	//		devMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+	//		ChangeDisplaySettings(&devMode, CDS_FULLSCREEN);
+	//	}
+	//	else {
+	//		ChangeDisplaySettings(NULL, 0);
+	//		SetWindowLong(mhWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 
-			// 윈도우 크기 설정
-			SetRect(&rect, 0, 0, mClientWidth, mClientHeight);
-			AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
-			SetWindowPos(mhWnd, 0, 100, 100, rect.right - rect.left, rect.bottom - rect.top, SWP_SHOWWINDOW);
-		}
-	}
+	//		// 윈도우 크기 설정
+	//		SetRect(&rect, 0, 0, mClientWidth, mClientHeight);
+	//		AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+	//		SetWindowPos(mhWnd, 0, 100, 100, rect.right - rect.left, rect.bottom - rect.top, SWP_SHOWWINDOW);
+	//	}
+	//}
 
 	int RADXSystem::Run()
 	{
@@ -71,7 +77,10 @@ namespace radx
 			}
 			else
 			{
-				mGraphics->Frame();
+				if (mD3D)
+				{
+					mD3D->Frame();
+				}
 			}
 		}
 		return msg.wParam;
@@ -84,16 +93,18 @@ namespace radx
 		case WM_SIZE:
 			
 			break;
-		case WM_MOVE:
-			break;
+		//case WM_MOVE:
+		//	break;
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 		case WM_MOUSEMOVE:
 		case WM_KEYDOWN:
+
 			break;
 		case WM_KEYUP:
 			break;
 		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
 			break;
 		}
 		return DefWindowProc(hWnd, message, wParam, lParam);

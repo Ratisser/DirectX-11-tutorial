@@ -10,7 +10,7 @@ namespace radx
 		TimerManager() = default;
 		~TimerManager() = default;
 
-		inline static TimerManager& GetInstance()
+		__forceinline static TimerManager& GetInstance()
 		{
 			static TimerManager instance;
 			return instance;

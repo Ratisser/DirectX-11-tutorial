@@ -14,19 +14,59 @@ namespace radx
 	bool Mesh::Initialize(ID3D11Device* device)
 	{
 		HRESULT hr;
-		CustomVertex vertices[] =
-		{
-			{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-			{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-			{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) },
-			{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) },
-			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-			{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-			{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) },
-		};
 
-		mVertexCount = 8;
+		mVertexCount = 3;
+		mIndexCount = 3;
+		CustomVertex vertices[3];
+		vertices[0].Position = XMFLOAT3(-1.0f, -1.0f, 0.0f);
+		vertices[0].Color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+		vertices[1].Position = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		vertices[1].Color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+		vertices[2].Position = XMFLOAT3(1.0f, -1.0f, 0.0f);
+		vertices[2].Color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+
+		short indices[3];
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
+
+		//mVertexCount = 8;
+		//mIndexCount = 36;
+		//CustomVertex vertices[] =
+		//{
+		//	{ XMFLOAT3(-1.0f, 1.0f, -1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
+		//	{ XMFLOAT3(1.0f, 1.0f, -1.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
+		//	{ XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) },
+		//	{ XMFLOAT3(-1.0f, 1.0f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
+		//	{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) },
+		//	{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
+		//	{ XMFLOAT3(1.0f, -1.0f, 1.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
+		//	{ XMFLOAT3(-1.0f, -1.0f, 1.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) },
+		//};
+
+		//WORD indices[] =
+		//{
+		//	3,1,0,
+		//	2,1,3,
+
+		//	0,5,4,
+		//	1,5,0,
+
+		//	3,4,7,
+		//	0,4,3,
+
+		//	1,6,5,
+		//	2,6,1,
+
+		//	2,7,6,
+		//	3,7,2,
+
+		//	6,4,5,
+		//	7,4,6,
+		//};
+
+
+
 
 		D3D11_BUFFER_DESC bd;
 		bd.CPUAccessFlags = 0;
@@ -34,46 +74,24 @@ namespace radx
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bd.ByteWidth = sizeof(CustomVertex) * mVertexCount;
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		D3D11_SUBRESOURCE_DATA initData;
-		initData.pSysMem = vertices;
-		initData.SysMemPitch = 0;
-		initData.SysMemSlicePitch = 0;
+		D3D11_SUBRESOURCE_DATA vertexData;
+		vertexData.pSysMem = vertices;
+		vertexData.SysMemPitch = 0;
+		vertexData.SysMemSlicePitch = 0;
 
-		hr = device->CreateBuffer(&bd, &initData, &mVertexBuffer);
+		hr = device->CreateBuffer(&bd, &vertexData, &mVertexBuffer);
 		if (FAILED(hr))
 		{
 			return false;
 		}
 
-		WORD indices[] =
-		{
-			3,1,0,
-			2,1,3,
-
-			0,5,4,
-			1,5,0,
-
-			3,4,7,
-			0,4,3,
-
-			1,6,5,
-			2,6,1,
-
-			2,7,6,
-			3,7,2,
-
-			6,4,5,
-			7,4,6,
-		};
-
-		mIndexCount = 36;
-
 		bd.Usage = D3D11_USAGE_DEFAULT;
 		bd.ByteWidth = sizeof(WORD) * mIndexCount;
 		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		initData.pSysMem = indices;
+		D3D11_SUBRESOURCE_DATA indexData;
+		indexData.pSysMem = indices;
 
-		hr = device->CreateBuffer(&bd, &initData, &mIndexBuffer);
+		hr = device->CreateBuffer(&bd, &indexData, &mIndexBuffer);
 		if (FAILED(hr))
 		{
 			return false;

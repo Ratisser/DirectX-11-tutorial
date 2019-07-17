@@ -14,7 +14,11 @@ namespace radx
 	bool D3D::Initialize(HWND hWnd, bool bVsync, UINT clientWidth, UINT clientHeight)
 	{
 		HRESULT hr;
+		mhWnd = hWnd;
+		mClientWidth = clientWidth;
+		mClientHeight = clientHeight;
 		mbVsync = bVsync;
+
 
 		// Direct3D를 초기화하기 전 그래픽 카드와 모니터에서 refresh rate를 얻어야 한다고 함.
 		// 그렇지 않고 refresh rate를 임의로 설정하면 DirectX가 버퍼 flip 대신 blt하여 성능이 저하되고 디버그 모드에 에러를 발생시킴
@@ -162,14 +166,14 @@ namespace radx
 		sd.BufferDesc.Height = clientHeight;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // 백버퍼의 사용처입니다.
 		sd.OutputWindow = hWnd; // 
-		sd.SampleDesc.Count = 16; // 멀티샘플링 입니다 (픽셀당 멀티샘플 수)
+		sd.SampleDesc.Count = 8; // 멀티샘플링 입니다 (픽셀당 멀티샘플 수)
 		sd.SampleDesc.Quality = -1; // D3D11_STANDARD_MULTISAMPLE_PATTERN, D3D11_CENTER_MULTISAMPLE_PATTERN 두개가 있습니다.
 		sd.Windowed = true; // 창모드
 
 		D3D_DRIVER_TYPE driverType;
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
 
-		for (i = 0; i < driverTypeCount; i++)
+		for (UINT i = 0; i < driverTypeCount; i++)
 		{
 			driverType = driverTypes[i];
 
@@ -271,21 +275,25 @@ namespace radx
 			return false;
 		}
 
-		mCamera.SetCamera(XMVectorSet(0.0f, 2.0f, -10.0f, 0.0f), XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
-		mView = mCamera.GetViewMatrix();
-		mProjection = XMMatrixPerspectiveFovLH(XM_PIDIV2, clientWidth / (float)clientHeight, 0.01f, 100.0f);
 		return LoadAsset();
 	}
 
 	bool D3D::LoadAsset()
 	{
 		HRESULT hr;
+
+		mCamera.SetCamera(XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f), XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
+		mView = mCamera.GetViewMatrix();
+		mProjection = XMMatrixPerspectiveFovLH(XM_PIDIV2, mClientWidth / (float)mClientHeight, 0.01f, 100.0f);
+
+
 		hr = mMesh.Initialize(mDevice);
 		mMesh.Load(mDeviceContext);
-		mMesh.SetPosition(XMVectorSet(3.0f, 0.0f, 1.0f, 0.0f));
+		mMesh.SetPosition(XMVectorSet(0.0f, 0.0f, 2.0f, 0.0f));
 
 		TimerManager::GetInstance().DeltaTimeTimer.InitTime();
 		TimerManager::GetInstance().DeltaTimeTimer.StartTimer();
+
 		return true;
 	}
 
@@ -296,6 +304,8 @@ namespace radx
 
 	void D3D::Release()
 	{
+		ReleaseAsset();
+
 		if (mConstantBuffer != nullptr)
 		{
 			mConstantBuffer->Release();
@@ -349,45 +359,41 @@ namespace radx
 		float deltaTime = TimerManager::GetInstance().DeltaTimeTimer.GetTime();
 		const float DGREE = 100.0f;
 
-		if (!TimerManager::GetInstance().DeltaTimeTimer.IsTimerStoped())
+		if (GetAsyncKeyState('A') & 0x8000)
 		{
-			if (GetAsyncKeyState('A') & 0x8000)
-			{
-				mCamera.RotateCamera(0.0f, -DGREE * deltaTime, 0.0f);
-			}
-			else if (GetAsyncKeyState('D') & 0x8000)
-			{
-				mCamera.RotateCamera(0.0f, DGREE * deltaTime, 0.0f);
-			}
-			if (GetAsyncKeyState('W') & 0x8000)
-			{
-				mCamera.RotateCamera(-DGREE * deltaTime, 0.0f, 0.0f);
-			}
-			else if (GetAsyncKeyState('S') & 0x8000)
-			{
-				mCamera.RotateCamera(DGREE * deltaTime, 0.0f, 0.0f);
-			}
-
-			if (GetAsyncKeyState('J') & 0x8000)
-			{
-				mMesh.Move(-5.0f * deltaTime, 0.0f, 0.0f);
-			}
-			else if (GetAsyncKeyState('L') & 0x8000)
-			{
-				mMesh.Move(5.0f * deltaTime, 0.0f, 0.0f);
-			}
-			if (GetAsyncKeyState('I') & 0x8000)
-			{
-				mMesh.Move(0.0f, 0.0f, 5.0f * deltaTime);
-			}
-			else if (GetAsyncKeyState('K') & 0x8000)
-			{
-				mMesh.Move(0.0f, 0.0f, -5.0f * deltaTime);
-			}
-
-			mMesh.Rotate(180 * deltaTime * RADIAN, 360 * deltaTime * RADIAN, 0.0f);
+			mCamera.RotateCamera(0.0f, -DGREE * deltaTime, 0.0f);
+		}
+		else if (GetAsyncKeyState('D') & 0x8000)
+		{
+			mCamera.RotateCamera(0.0f, DGREE * deltaTime, 0.0f);
+		}
+		if (GetAsyncKeyState('W') & 0x8000)
+		{
+			mCamera.RotateCamera(-DGREE * deltaTime, 0.0f, 0.0f);
+		}
+		else if (GetAsyncKeyState('S') & 0x8000)
+		{
+			mCamera.RotateCamera(DGREE * deltaTime, 0.0f, 0.0f);
 		}
 
+		if (GetAsyncKeyState('J') & 0x8000)
+		{
+			mMesh.Move(-5.0f * deltaTime, 0.0f, 0.0f);
+		}
+		else if (GetAsyncKeyState('L') & 0x8000)
+		{
+			mMesh.Move(5.0f * deltaTime, 0.0f, 0.0f);
+		}
+		if (GetAsyncKeyState('I') & 0x8000)
+		{
+			mMesh.Move(0.0f, 0.0f, 5.0f * deltaTime);
+		}
+		else if (GetAsyncKeyState('K') & 0x8000)
+		{
+			mMesh.Move(0.0f, 0.0f, -5.0f * deltaTime);
+		}
+
+		//mMesh.Rotate(180 * deltaTime * RADIAN, 360 * deltaTime * RADIAN, 0.0f);
 
 
 		if (GetAsyncKeyState('Z') & 0x8000)
@@ -396,10 +402,38 @@ namespace radx
 		}
 		else if (GetAsyncKeyState('X') & 0x8000)
 		{
-			TimerManager::GetInstance().DeltaTimeTimer.ResetTime();
 			TimerManager::GetInstance().DeltaTimeTimer.StartTimer();
+			TimerManager::GetInstance().DeltaTimeTimer.GetTime();
+			TimerManager::GetInstance().DeltaTimeTimer.ResetTime();
+		}
+	}
+
+	void D3D::Frame()
+	{
+		UpdateScene();
+
+		static UINT frameCount = 0;
+		static float timeElapsed = TimerManager::GetInstance().SystemTimer.GetTime();
+
+		BeginScene(0.2f, 0.2f, 0.5f, 1.0f);
+
+		EndScene();
+
+		if (TimerManager::GetInstance().SystemTimer.GetTime() - timeElapsed >= 1.0f)
+		{
+			float fps = (float)frameCount;
+			float msPerFrame = 1000.0f / fps;
+
+			std::wostringstream out;
+			out.precision(6);
+			out << L"FPS: " << fps << L" Frame Time: " << msPerFrame << L"ms" << L" VideoCard: " << GetVideoCardDescription();
+			SetWindowText(mhWnd, out.str().c_str());
+
+			frameCount = 0;
+			timeElapsed = TimerManager::GetInstance().SystemTimer.GetTime();
 		}
 
+		frameCount++;
 	}
 
 	void D3D::BeginScene(float red, float green, float blue, float alpha)
@@ -431,6 +465,10 @@ namespace radx
 		{
 			mSwapChain->Present(0, 0);
 		}
+	}
+	const char* D3D::GetVideoCardDescription() 
+	{
+		return mVideoCardDescription;
 	}
 }
 

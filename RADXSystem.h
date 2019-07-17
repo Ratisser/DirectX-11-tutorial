@@ -1,9 +1,8 @@
 #pragma once
 
-
 #include "Input.h"
 #include "BasicWindow.h"
-#include "Graphics.h"
+#include "D3D.h"
 
 namespace radx
 {
@@ -18,15 +17,14 @@ namespace radx
 		~RADXSystem();
 
 		bool Initialize();
-		void ChangeScreenMode(bool bFullScreen);
+		//void ChangeScreenMode(bool bFullScreen);
 
 		int Run() override;
 
 		LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
 	private:
-		std::unique_ptr<Input> mInput;
-		std::unique_ptr<Graphics> mGraphics;
+		D3D* mD3D;
 
 		UINT mClientWidth;
 		UINT mClientHeight;
